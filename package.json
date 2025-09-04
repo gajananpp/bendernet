@@ -23,7 +23,8 @@
 		"assistant-ui",
 		"langchain"
 	],
-	"version": "0.1.0",
+	"homepage": "https://bendernet.vercel.app",
+	"version": "0.1.1",
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
