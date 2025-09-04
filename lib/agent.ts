@@ -70,8 +70,18 @@ A query is considered relevant ("true") if it can be answered using a table with
 **Examples:**
 - User: "Show me all electronics products" -> true
 - User: "products with price > 100" -> true
+- User: "products below 20$" -> true
+- User: "stocks above 50" -> true
+- User: "products that costs above 25" -> true
+- User: "show me active products" -> true
+- User: "find items in clothing category" -> true
+- User: "list products updated last week" -> true
+- User: "which items are pending status" -> true
+- User: "expensive products over $50" -> true
 - User: "What's the weather today?" -> false
 - User: "hi" -> false
+- User: "how are you?" -> false
+- User: "tell me a joke" -> false
 `;
 	const lastMessage = state.messages[state.messages.length - 1];
 	const response = await getModel().invoke(
@@ -147,6 +157,33 @@ You are querying a products table. The only valid column names you can use are:
 When unsure which columns to show, use *.
 **User:** "What products are out of stock?"
 **You:** show * where stock = 0
+
+**User:** "products below 20$"
+**You:** show * where price < 20
+
+**User:** "stocks above 50"
+**You:** show * where stock > 50
+
+**User:** "products that costs above 25"
+**You:** show * where price > 25
+
+**User:** "show me active products"
+**You:** show * where status = 'active'
+
+**User:** "find items in clothing category"
+**You:** show * where category = 'clothing'
+
+**User:** "which items are pending status"
+**You:** show * where status = 'pending'
+
+**User:** "expensive products over $50"
+**You:** show * where price > 50
+
+**User:** "show product names and prices for electronics"
+**You:** show name, price where category = 'electronics'
+
+**User:** "inactive items with their stock levels"
+**You:** show name, stock where status = 'inactive'
   `;
 	const response = await getModel().invoke(
 		[new SystemMessage(systemPrompt), ...state.messages],
