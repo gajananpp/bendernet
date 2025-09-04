@@ -21,7 +21,7 @@
 
 ## 🚀 Live Demo
 
-Experience BenderNet in action: [Live Demo](https://your-demo-url.com)
+Experience BenderNet in action: [Live Demo](https://bendernet.vercel.app)
 
 ## 🛠️ Technology Stack
 
