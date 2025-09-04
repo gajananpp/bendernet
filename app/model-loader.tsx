@@ -51,7 +51,7 @@ export function ModelLoader() {
 					</h1>
 					<p className="text-muted-foreground">
 						This standalone app uses web-llm. Downloading model{" "}
-						{`'${MODEL_NAME}'`} approximately {MODEL_SIZE} in browser for inference....
+						{`'${MODEL_NAME}'`} approximately {MODEL_SIZE} in browser for inference. Download start takes few minutes....
 					</p>
 				</div>
 
