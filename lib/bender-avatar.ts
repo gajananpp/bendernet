@@ -304,6 +304,10 @@ export class BenderAvatarController {
 	 */
 	public stopBlinking(): void {
 		this.blinkTimeline = this.clearTimeline(this.blinkTimeline);
+		
+		// Ensure eyes remain open (scaleY: 1) when blinking stops
+		const eyeElements = [this.leftEyeIdleWhite, this.rightEyeIdleWhite];
+		gsap.set(eyeElements, { scaleY: 1 });
 	}
 
 	/**
