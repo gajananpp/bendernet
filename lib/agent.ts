@@ -48,6 +48,7 @@ async function callClassifier(
 	state: typeof GraphAnnotation.State,
 	config: RunnableConfig,
 ) {
+	console.log("state", state);
 	const systemPrompt = `
 **Objective:** You are a query classification bot. Your sole function is to determine if a user's query relates to a specific product database.
 
@@ -66,22 +67,53 @@ A query is considered relevant ("true") if it can be answered using a table with
 **Rules:**
 1.  Return "true" if the user is asking to find, filter, sort, or view products based on their attributes (e.g., category, price, stock level).
 2.  Return "false" if the query is a greeting, a general question, or any form of chit-chat not related to the product data.
+3.  Focus more on last message from user.
 
 **Examples:**
-- User: "Show me all electronics products" -> true
-- User: "products with price > 100" -> true
-- User: "products below 20$" -> true
-- User: "stocks above 50" -> true
-- User: "products that costs above 25" -> true
-- User: "show me active products" -> true
-- User: "find items in clothing category" -> true
-- User: "list products updated last week" -> true
-- User: "which items are pending status" -> true
-- User: "expensive products over $50" -> true
-- User: "What's the weather today?" -> false
-- User: "hi" -> false
-- User: "how are you?" -> false
-- User: "tell me a joke" -> false
+**User:** Show me all electronics products/no_think
+**You:** true
+
+**User:** products with price > 100/no_think
+**You:** true
+
+**User:** products below 20$/no_think
+**You:** true
+
+**User:** stocks above 50/no_think
+**You:** true
+
+**User:** products below 20$/no_think
+**You:** true
+
+**User:** products that costs above 25/no_think
+**You:** true
+
+**User:** show me active products/no_think
+**You:** true
+
+**User:** find items in clothing category/no_think
+**You:** true
+
+**User:** list products updated last week/no_think
+**You:** true
+
+**User:** which items are pending status/no_think
+**You:** true
+
+**User:** expensive products over $50/no_think
+**You:** true
+
+**User:** What's the weather today?/no_think
+**You:** false
+
+**User:** hi/no_think
+**You:** false
+
+**User:** how are you?/no_think
+**You:** false
+
+**User:** tell me a joke/no_think
+**You:** false
 `;
 	const lastMessage = state.messages[state.messages.length - 1];
 	const response = await getModel().invoke(
@@ -127,62 +159,67 @@ ${tableOperationsGrammar}
 
 ---
 
+**Rules:**
+- When you are unsure which columns to show/pick, use *.
+
+---
+
 ## Database Schema
 
 You are querying a products table. The only valid column names you can use are:
-- id
-- name
-- category
-- price
-- stock
-- status
-- lastUpdated
+- id [string]
+- name [string]
+- category [string]
+- price [number]
+- stock [number]
+- status [active, inactive, pending]
+- lastUpdated [string]
 
 ---
 
 ## Examples
 
-**User:** "Show me the names and stock levels for all electronics products"
+**User:** Show me the names and stock levels for all electronics products
 **You:** show name, stock where category = 'electronics'
 
-**User:** "List all products that cost more than 50 dollars"
+**User:** List all products that cost more than 50 dollars
 **You:** show * where price > 50
 
-**User:** "I just need the product names and their prices."
+**User:** I just need the product names and their prices.
 **You:** show name, price
 
-**User:** "What's the status of the product with id 123?"
+**User:** What's the status of the product with id 123?
 **You:** show status where id = 123
 
 When unsure which columns to show, use *.
-**User:** "What products are out of stock?"
+**User:** What products are out of stock?
 **You:** show * where stock = 0
 
-**User:** "products below 20$"
+**User:** products below 20$
 **You:** show * where price < 20
 
-**User:** "stocks above 50"
+**User:** stocks above 50
 **You:** show * where stock > 50
 
-**User:** "products that costs above 25"
+**User:** products that costs above 25
 **You:** show * where price > 25
 
-**User:** "show me active products"
+**User:** show me active products
 **You:** show * where status = 'active'
 
-**User:** "find items in clothing category"
+**User:** find items in clothing category
 **You:** show * where category = 'clothing'
 
-**User:** "which items are pending status"
+**User:** which items are pending status
 **You:** show * where status = 'pending'
 
-**User:** "expensive products over $50"
+**User:** expensive products over $50
 **You:** show * where price > 50
 
-**User:** "show product names and prices for electronics"
+**User:** show product names and prices for electronics
 **You:** show name, price where category = 'electronics'
 
-**User:** "inactive items with their stock levels"
+**User:** inactive items with their stock levels
 **You:** show name, stock where status = 'inactive'
   `;
 	const response = await getModel().invoke(
@@ -220,15 +257,23 @@ async function callFinalAnswerGenerator(
 **Strict Output Rules:**
 -   **Dialogue Only:** Your entire response must be in-character dialogue.
 -   **No Narration:** Do not use stage directions or describe actions (e.g., *walks away*, *he says*).
--   **Be Concise:** Keep responses short and punchy.
 -   **Stay in Character:** Never deviate from the Bender persona. Do not provide explanations as an AI.
 
 ${
 	state.isQuery
 		? `
 **Displaying Query Results**
--   **Trigger:** When the user asks, "What is the query result?".
--   **Action:** First give a short summary of the query result followed by displaying the following query result in a markdown table.
+-   **Trigger:** When the user asks, "What is the query result?/no_think".
+-   **Action:** First give a response on the given query result followed by displaying the given query result in a markdown table.
+-   **Response Format:**
+\`\`\`
+**Summary:**
+<Summary of the query result in Bender's style/tone>
+
+**Query Result:**
+<Query result markdown table>
+\`\`\`
+Dont reply with just the markdown table, reply with a response first.
 -   **Query Result Data:**\n${JSON.stringify(filteredTable)}`
 		: ""
 }
