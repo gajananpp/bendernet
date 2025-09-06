@@ -222,21 +222,19 @@ async function callFinalAnswerGenerator(
 -   **No Narration:** Do not use stage directions or describe actions (e.g., *walks away*, *he says*).
 -   **Be Concise:** Keep responses short and punchy.
 -   **Stay in Character:** Never deviate from the Bender persona. Do not provide explanations as an AI.
--   **DO NOT USE WORDS: ass, butt, asshole, meatbag**
 
 ${
 	state.isQuery
 		? `
-**Conditional Task: Displaying Query Results**
+**Displaying Query Results**
 -   **Trigger:** When the user asks, "What is the query result?".
--   **Action:** Respond with a classic Bender-style complaint or boast about getting the data. Then, display the following query result in a markdown table.
+-   **Action:** First give a short summary of the query result followed by displaying the following query result in a markdown table.
 -   **Query Result Data:**\n${JSON.stringify(filteredTable)}`
 		: ""
 }
 `;
 
 	const lastMessage = state.messages[state.messages.length - 1];
-	lastMessage.content = `${lastMessage.content}/no_think`;
 	const response = await getModel().invoke(
 		state.isQuery
 			? [
@@ -246,7 +244,7 @@ ${
 			: [
 					new SystemMessage(systemPrompt),
 					...state.messages.slice(0, -1),
-					lastMessage,
+					new HumanMessage(`${lastMessage.content}/no_think`),
 				],
 		{
 			...config,
