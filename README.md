@@ -7,7 +7,7 @@
 
 **BenderNet** is an innovative chatbot that demonstrates how Small Language Models (SLMs) can produce structured output using grammar-based constraints. Built with WebLLM, LangGraph, and Lark Parser, it features the iconic Bender from Futurama as your sarcastic AI assistant.
 
-![BenderNet Demo](public/bender-stamp.png)
+![BenderNet Demo](public/output.gif)
 
 ## 🌟 Features
 
